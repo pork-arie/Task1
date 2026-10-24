@@ -16,7 +16,7 @@ route.get("/", async (req,res) => {
 route.post("/" , async (req,res) => {
     try {
       const {name,price,description} = req.body
-      if(!name || price === undefined){
+      if(!name ||description|| price === undefined){
           return  res.status(400).json({error:"Name and price are required"})
         }
 
