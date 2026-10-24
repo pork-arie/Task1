@@ -1,6 +1,7 @@
 const express = require("express")
 const route = express.Router()
 const prod = require("../models/prod")
+const mongoose = require("mongoose")
 
 route.get("/", async (req,res) => {
     try {
@@ -25,6 +26,26 @@ route.post("/" , async (req,res) => {
          res.status(500).json({error:"server error sa product post"})
         
     }
+})
+
+route.get("/:id", async(req,res) => {
+     try {
+        const {id} = req.params
+        if(!mongoose.Types.ObjectId.isValid(id)){
+            return res.status(400).json({error:"Invalid product ID"})
+
+        }
+        const product = await prod.findById(id)
+        if(!product){
+            return res.status(404).json({error:"product not found"})
+        }
+       
+        res.json(product)
+     } catch (error) {
+        res.status(500).json({error:"server error for product get:id"})
+    
+        
+     }
 })
 
 module.exports = route
