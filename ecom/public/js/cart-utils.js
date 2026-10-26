@@ -10,10 +10,12 @@ function getCart() {
 
 function saveCart(cart) {
   localStorage.setItem("cart", JSON.stringify(cart))
+  if (typeof updateCartCount === "function") updateCartCount()
 }
 
 function clearCart() {
   localStorage.removeItem("cart")
+  if (typeof updateCartCount === "function") updateCartCount()
 }
 
 function addToCart(product) {
@@ -27,6 +29,7 @@ function addToCart(product) {
       productId: product._id,
       name: product.name,
       price: product.price,
+      image: product.image,
       qty: 1
     })
   }
@@ -65,4 +68,27 @@ function escapeHtml(text) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;")
+}
+
+// product image, or the first letter of the name if there's no image / it fails to load
+function mediaHtml(src, name, extra = "") {
+  const letter = escapeHtml(String(name || "?").trim().charAt(0).toUpperCase())
+  const img = src ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.remove()">` : ""
+  return `<div class="media" data-letter="${letter}">${extra}${img}</div>`
+}
+
+function showToast(html) {
+  let toast = document.querySelector(".toast")
+  if (!toast) {
+    toast = document.createElement("div")
+    toast.className = "toast"
+    toast.setAttribute("role", "status")
+    document.body.appendChild(toast)
+  }
+
+  toast.innerHTML = html
+  requestAnimationFrame(() => toast.classList.add("show"))
+
+  clearTimeout(toast.hideTimer)
+  toast.hideTimer = setTimeout(() => toast.classList.remove("show"), 3000)
 }

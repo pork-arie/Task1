@@ -3,33 +3,44 @@ const message = document.getElementById("message")
 
 function renderCart() {
   const cart = getCart()
+  const layout = document.getElementById("cartLayout")
   const container = document.getElementById("cartItems")
-  const totalEl = document.getElementById("cartTotal")
 
   if (cart.length === 0) {
-    container.innerHTML = `<p>Your cart is empty. <a href="/">Shop now</a></p>`
-    totalEl.textContent = ""
-    checkoutBtn.style.display = "none"
+    layout.classList.add("empty")
+    container.innerHTML = `
+      <div class="empty-state">
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added anything yet.</p>
+        <a href="/" class="btn">Start shopping</a>
+      </div>`
     return
   }
 
+  layout.classList.remove("empty")
+
   container.innerHTML = cart.map(item => `
     <div class="cart-row">
-      <h3>${escapeHtml(item.name)}</h3>
-      <p>${formatPeso(item.price)}</p>
-      <div class="qty">
-        <button class="minus" data-id="${escapeHtml(item.productId)}" data-qty="${item.qty}">−</button>
-        <span>${item.qty}</span>
-        <button class="plus" data-id="${escapeHtml(item.productId)}" data-qty="${item.qty}">+</button>
+      ${mediaHtml(item.image, item.name)}
+      <div class="cart-info">
+        <h3>${escapeHtml(item.name)}</h3>
+        <p class="muted">${formatPeso(item.price)} each</p>
+        <button class="link-btn remove" data-id="${escapeHtml(item.productId)}">Remove</button>
       </div>
-      <p>Subtotal: ${formatPeso(item.price * item.qty)}</p>
-      <button class="remove" data-id="${escapeHtml(item.productId)}">Remove</button>
+      <div class="qty">
+        <button class="minus" data-id="${escapeHtml(item.productId)}" data-qty="${item.qty}" aria-label="Decrease quantity">−</button>
+        <span>${item.qty}</span>
+        <button class="plus" data-id="${escapeHtml(item.productId)}" data-qty="${item.qty}" aria-label="Increase quantity">+</button>
+      </div>
+      <p class="line-total">${formatPeso(item.price * item.qty)}</p>
     </div>
   `).join("")
 
+  const count = cart.reduce((sum, item) => sum + item.qty, 0)
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
-  totalEl.textContent = `Total: ${formatPeso(total)}`
-  checkoutBtn.style.display = "block"
+  document.getElementById("itemCount").textContent = `${count} item${count === 1 ? "" : "s"}`
+  document.getElementById("subtotal").textContent = formatPeso(total)
+  document.getElementById("cartTotal").textContent = formatPeso(total)
 
   container.querySelectorAll(".plus").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -57,6 +68,7 @@ checkoutBtn.addEventListener("click", async () => {
   const items = getCart().map(item => ({ productId: item.productId, qty: item.qty }))
   message.textContent = ""
   checkoutBtn.disabled = true
+  checkoutBtn.textContent = "Placing order..."
 
   try {
     const res = await fetch("/api/orders", {
@@ -82,6 +94,7 @@ checkoutBtn.addEventListener("click", async () => {
     message.textContent = "Something went wrong. Try again."
   } finally {
     checkoutBtn.disabled = false
+    checkoutBtn.textContent = "Checkout"
   }
 })
 

@@ -4,19 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Orders | My Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav>
-    <a href="/" class="brand">My Store</a>
-    <a href="cart.html">Cart</a>
-    <span id="userArea"></span>
-  </nav>
+  <header class="site-header">
+    <nav class="nav">
+      <a href="/" class="brand"><span class="brand-mark">◆</span>My Store</a>
+      <div class="nav-links">
+        <span id="userArea"></span>
+        <a href="cart.html" class="cart-link" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span id="cartCount" class="badge" hidden>0</span>
+        </a>
+      </div>
+    </nav>
+  </header>
 
   <main>
-    <h1>My orders</h1>
+    <h1 class="page-title">My orders</h1>
     <div id="orders"></div>
   </main>
+
+  <footer class="site-footer">© 2026 My Store · Made with care in the Philippines</footer>
 
   <script src="js/nav.js"></script>
   <script src="js/cart-utils.js"></script>

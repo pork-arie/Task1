@@ -1,8 +1,12 @@
 const statuses = ["pending", "paid", "shipped"]
 
+function emptyState(title, text) {
+  return `<div class="empty-state"><h2>${title}</h2><p>${text}</p></div>`
+}
+
 async function loadAllOrders() {
   const container = document.getElementById("orders")
-  container.textContent = "loading..."
+  container.innerHTML = `<p class="muted">Loading orders...</p>`
 
   try {
     const res = await fetch("/api/orders")
@@ -12,7 +16,7 @@ async function loadAllOrders() {
       return
     }
     if (res.status === 403) {
-      container.textContent = "Admins only."
+      container.innerHTML = emptyState("Admins only", "You need an admin account to see this page.")
       return
     }
     if (!res.ok) throw new Error("Request failed")
@@ -20,42 +24,55 @@ async function loadAllOrders() {
     const orders = await res.json()
 
     if (orders.length === 0) {
-      container.textContent = "No orders yet."
+      container.innerHTML = emptyState("No orders yet", "Orders from customers will appear here.")
       return
     }
 
     container.innerHTML = orders.map(order => `
-      <div class="order">
+      <article class="order">
         <div class="order-head">
-          <strong>${order.user ? `${escapeHtml(order.user.name)} (${escapeHtml(order.user.email)})` : "Deleted user"}</strong>
-          <span>${new Date(order.createdAt).toLocaleString()}</span>
+          <div>
+            <strong>${order.user ? escapeHtml(order.user.name) : "Deleted user"}</strong>
+            <span class="muted">${order.user ? escapeHtml(order.user.email) : ""}</span>
+          </div>
+          <div>
+            <strong>Order #${escapeHtml(order._id.slice(-6).toUpperCase())}</strong>
+            <span class="muted">${new Date(order.createdAt).toLocaleString()}</span>
+          </div>
         </div>
-        <ul>
+        <ul class="order-items">
           ${order.items.map(item => `
-            <li>${escapeHtml(item.name)} × ${item.qty} — ${formatPeso(item.price * item.qty)}</li>
+            <li>
+              <span>${escapeHtml(item.name)} <span class="muted">× ${item.qty}</span></span>
+              <span>${formatPeso(item.price * item.qty)}</span>
+            </li>
           `).join("")}
         </ul>
-        <p>Total: ${formatPeso(order.total)}</p>
-        <label>
-          Status
-          <select data-id="${escapeHtml(order._id)}">
-            ${statuses.map(s => `<option value="${s}" ${s === order.status ? "selected" : ""}>${s}</option>`).join("")}
-          </select>
-        </label>
-        <span class="saved"></span>
-      </div>
+        <div class="order-foot">
+          <div class="status-control">
+            <span class="status status-${escapeHtml(order.status)}">${escapeHtml(order.status)}</span>
+            <select data-id="${escapeHtml(order._id)}" aria-label="Order status">
+              ${statuses.map(s => `<option value="${s}" ${s === order.status ? "selected" : ""}>${s}</option>`).join("")}
+            </select>
+            <span class="saved"></span>
+          </div>
+          <span class="total">${formatPeso(order.total)}</span>
+        </div>
+      </article>
     `).join("")
 
     container.querySelectorAll("select").forEach(select => {
       select.addEventListener("change", () => saveStatus(select))
     })
   } catch (error) {
-    container.textContent = "Couldn't load orders"
+    container.innerHTML = emptyState("Couldn't load orders", "Try refreshing the page.")
   }
 }
 
 async function saveStatus(select) {
-  const note = select.closest(".order").querySelector(".saved")
+  const order = select.closest(".order")
+  const note = order.querySelector(".saved")
+  const pill = order.querySelector(".status")
   note.textContent = "saving..."
 
   try {
@@ -66,7 +83,14 @@ async function saveStatus(select) {
     })
     const data = await res.json()
 
-    note.textContent = res.ok ? "saved" : data.error
+    if (!res.ok) {
+      note.textContent = data.error
+      return
+    }
+
+    pill.className = `status status-${select.value}`
+    pill.textContent = select.value
+    note.textContent = "saved ✓"
   } catch (error) {
     note.textContent = "Something went wrong. Try again."
   }
