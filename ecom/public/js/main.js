@@ -1,34 +1,28 @@
-
-
 async function loadProducts() {
-  
-   const container = document.getElementById("products")
-    container.textContent = "loading..."
+  const container = document.getElementById("products")
+  container.textContent = "loading..."
+
+  try {
     const res = await fetch("/api/product")
-    const products = await  res.json()
     if (!res.ok) throw new Error("Request failed")
+    const products = await res.json()
 
-   try {
-    
+    if (products.length === 0) {
+      container.textContent = "No products yet."
+      return
+    }
 
-    container.innerHTML =""
-    
-    products.forEach(p => {
-        container.innerHTML += `<div> 
-        <h1>${p.name}</h1> 
-       
-        <p>${p.price}</p>
-        <img src="${p.image}" alt="${p.name}">
-        <a href = "product.html?id=${p._id}">view</a>
-        </div>`
-    });
-    
-
-   } catch (error) {
+    container.innerHTML = products.map(p => `
+      <div class="card">
+        ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">` : ""}
+        <h2>${escapeHtml(p.name)}</h2>
+        <p class="price">${formatPeso(p.price)}</p>
+        <a href="product.html?id=${encodeURIComponent(p._id)}">View</a>
+      </div>
+    `).join("")
+  } catch (error) {
     container.textContent = "Couldn't load products"
-   
-   }
-
+  }
 }
 
 loadProducts()

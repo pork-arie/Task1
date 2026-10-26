@@ -1,11 +1,19 @@
 function getCart() {
-  const saved = localStorage.getItem("cart")
-  if (!saved) return []
-  return JSON.parse(saved)
+  try {
+    const saved = localStorage.getItem("cart")
+    if (!saved) return []
+    return JSON.parse(saved)
+  } catch (error) {
+    return []
+  }
 }
 
 function saveCart(cart) {
   localStorage.setItem("cart", JSON.stringify(cart))
+}
+
+function clearCart() {
+  localStorage.removeItem("cart")
 }
 
 function addToCart(product) {
@@ -43,4 +51,18 @@ function updateQty(productId, qty) {
 function removeFromCart(productId) {
   const cart = getCart().filter(item => item.productId !== productId)
   saveCart(cart)
+}
+
+function formatPeso(amount) {
+  return Number(amount).toLocaleString("en-PH", { style: "currency", currency: "PHP" })
+}
+
+// use this before putting user/product text inside innerHTML
+function escapeHtml(text) {
+  return String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
 }

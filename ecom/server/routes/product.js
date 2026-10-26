@@ -16,8 +16,8 @@ route.get("/", async (req,res) => {
 route.post("/" , async (req,res) => {
     try {
       const {name,price,description} = req.body
-      if(!name ||description|| price === undefined){
-          return  res.status(400).json({error:"Name and price are required"})
+      if(!name || !description || price === undefined){
+          return  res.status(400).json({error:"Name, description and price are required"})
         }
 
       const Product = await prod.create(req.body)

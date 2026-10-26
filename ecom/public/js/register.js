@@ -22,7 +22,7 @@ form.addEventListener("submit", async (e) =>{
       return
     }
 
-    window.location.href = "index.html"
+    window.location.href = "login.html"
   } catch (error) {
     message.textContent = "Something went wrong. Try again."
   }

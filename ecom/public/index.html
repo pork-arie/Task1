@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Store</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-     <nav>
-        <span id="userArea"></span>
-        <ul>
-            <li><a href="#">cart</a></li>
-        </ul>
-     </nav>
-    <h1>my store</h1>
-    <div id="products"></div>
-    <button id="but">button</button>
+  <nav>
+    <a href="/" class="brand">My Store</a>
+    <a href="cart.html">Cart</a>
+    <span id="userArea"></span>
+  </nav>
 
-    <script src="js/main.js"></script>
-    <script src="js/nav.js"></script>
+  <main>
+    <h1>My Store</h1>
+    <div id="products" class="grid"></div>
+  </main>
+
+  <script src="js/nav.js"></script>
+  <script src="js/cart-utils.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
