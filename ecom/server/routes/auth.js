@@ -2,7 +2,7 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 const route = express.Router()
 const User = require("../models/User")
-
+const requireAuth = require("../middleware/auth")
 const jwt = require("jsonwebtoken")
 
 
@@ -63,6 +63,24 @@ route.post('/login',async (req,res) => {
     } catch (error) {
         res.status(500).json({error:"server error"})
     }
+})
+
+route.get('/me',requireAuth, async (req,res) => {
+    try {
+        const user = await User.findById(req.userid).select("-password")
+         if(!user){
+            return res.status(401).json({error:"not found"})
+         }
+         res.status(200).json(user)
+    } catch (error) {
+        res.status(500).json({error:"server error"})
+    }
+})
+
+route.post("/logout", async (req,res)=> {
+    
+        res.clearCookie("token")
+        res.json({ message: "Logged out" }) 
 })
 
 

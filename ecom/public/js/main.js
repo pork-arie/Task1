@@ -5,8 +5,8 @@ async function loadProducts() {
    const container = document.getElementById("products")
     container.textContent = "loading..."
     const res = await fetch("/api/product")
-    const products =await  res.json()
-     if (!res.ok) throw new Error("Request failed")
+    const products = await  res.json()
+    if (!res.ok) throw new Error("Request failed")
 
    try {
     
